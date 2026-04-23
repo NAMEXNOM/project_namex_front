@@ -1,9 +1,9 @@
 import Image from "next/image";
 
-export default function About() {
+export default function RolesPAge() {
   return (
     <div className="text-lg">
-      HOLA DESDE ABOUT
+      HOLA DESDE ROLES
     </div>
   );
 }
