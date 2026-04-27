@@ -29,7 +29,7 @@ export default function MainLayout({
       { label: 'Salir', icon: 'pi pi-sign-out', command: () => {alert("LOGOUT") }}
     ]
 
-    const theme = 'dark'
+    
   
     return (
     <div className="min-h-screen bg-gray-100" >
