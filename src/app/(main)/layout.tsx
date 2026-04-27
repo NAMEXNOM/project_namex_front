@@ -32,10 +32,10 @@ export default function MainLayout({
     const theme = 'dark'
   
     return (
-    <div className="min-h-screen bg-gray-100" >
+    <div className="min-h-screen bg-gray-200" >
       <div className="flex">
         {/*Sidebar*/}
-        <div className="hidden lg:flex lg:flex-col lg:w-64 lg:fixed lg:inset-y-0 bg-white shadow-lg border-r border-gray-200 ">
+        <div className="lg:flex lg:flex-col lg:w-64 lg:fixed lg:inset-y-0 bg-white shadow-lg border-r border-gray-200 ">
           <div className="flex items-center h-16 px-6 border-b border-gray-200">
             <h1 className="text-lg font-bold text-gr ">Módulo NAMEX</h1>
           </div>
@@ -70,7 +70,7 @@ export default function MainLayout({
             </div>
             <div className="flex items-center">
               <Button icon="pi pi-bell"></Button>
-              <Button icon="pi pi-info"></Button>
+              
               <div>
                 <Button icon="pi pi-info" onClick={(e)=>userMenuRef.current?.toggle(e)}></Button>
                 <Menu model={topbarItems} popup ref={userMenuRef} className=""></Menu>
