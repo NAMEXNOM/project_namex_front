@@ -5,7 +5,7 @@ export default function FullPageLayout({
 }>) {
   return (
     <div className="min-h-screen w-full flex items-center justify-center">
-        Hola desde login
+        
         {children}
     </div> 
   );

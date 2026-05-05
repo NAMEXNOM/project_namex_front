@@ -1,6 +1,6 @@
 import Image from "next/image";
 
-export default function RolesPAge() {
+export default function RolesPage() {
   return (
     <div className="text-lg">
       HOLA DESDE ROLES
