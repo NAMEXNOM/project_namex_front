@@ -5,13 +5,26 @@ import { useRouter } from "next/navigation";
 import { Button } from "primereact/button";
 import { Menu } from "primereact/menu";
 import { MenuItem } from "primereact/menuitem";
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
-export default function MainLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+export default function MainLayout(
+  {children}: {children: React.ReactNode}) {
+    const [datos, setDatos] = useState<any>(null);
+
+    useEffect(() => {
+        // Llamada al endpoint de NestJS
+        const fetchUser = async () => {
+            try {
+                const response = await fetch('http://localhost:5000/users'); // Ajusta a tu ruta real
+                const data = await response.json();
+                setDatos(data);
+            } catch (error) {
+                console.error("Error cargando usuario:", error);
+            }
+        };
+        fetchUser();
+    }, []);
+
 
     const router = useRouter();
     const pathname = usePathname();
@@ -32,57 +45,40 @@ export default function MainLayout({
     
   
     return (
-    <div className="min-h-screen bg-gray-200" >
-      <div className="flex">
-        {/*Sidebar*/}
-        <div className="lg:flex lg:flex-col lg:w-64 lg:fixed lg:inset-y-0 bg-white shadow-lg border-r border-gray-200 ">
-          <div className="flex items-center h-16 px-6 border-b border-gray-200">
-            <h1 className="text-lg font-bold text-gr ">Módulo NAMEX</h1>
-          </div>
-          <nav className="flex-1 mt-6 px-3">
-            <div className="space-y-1">
-              {navigationItems.map((item)=>{
-                const isActive = pathname === item.href;
-                return (
-                  <Link
-                  key={item.name}
-                  href={item.href}
-                  className={`flex items-center px-3 py-2 text-sm font-medium rounded-lg
-                    ${isActive 
-                      ? 'bg-blue-100 text-blue-700 border-r-2 borderblue-700'
-                      :'text-gray-700 hover:bg-gray-50 hover:text-gray-900'}`}
-                  >
-                    <i className={`${item.icon} mr-3`}></i>
-                    <span>{item.name}</span>
-                  </Link>
-                )
+    <div className="min-h-screen bg-gray-200 flex">
+        {/* Sidebar Lateral */}
+        <aside className="w-64 bg-white shadow-md">
+            <div className="p-4 font-bold text-xl border-b">Mi App</div>
+            <nav className="p-2">
+                {navigationItems.map((item) => (
+                    <Link 
+                        key={item.href} 
+                        href={item.href}
+                        className={`flex items-center p-3 mb-2 rounded-md ${pathname === item.href ? 'bg-blue-100 text-blue-600' : 'text-gray-700 hover:bg-gray-100'}`}
+                    >
+                        <i className={`${item.icon} mr-2`}></i>
+                        {item.name}
+                    </Link>
+                ))}
+            </nav>
+        </aside>
 
-              })}
+        {/* Contenido Principal */}
+        <main className="flex-1">
+            <header className="bg-white p-4 shadow-sm flex justify-between items-center">
+                <span>Bienvenido, {datos?.name || 'Cargando...'}</span>
+                <Menu model={topbarItems} popup ref={userMenuRef} />
+                <Button 
+                    icon="pi pi-user" 
+                    className="p-button-rounded p-button-text" 
+                    onClick={(e) => userMenuRef.current?.toggle(e)} 
+                />
+            </header>
+            
+            <div className="p-6">
+                {children} {/* Aquí se mostrarán las páginas /users, /roles, etc. */}
             </div>
-
-          </nav>
-        </div>
-        <div className="flex-1 lg:ml-64">
-          {/*Top bar*/}
-          <header className="bg-white shadow-sm border-b border-gray-200 h-16 flex items-center justify-between px-4 lg:px-6">
-            <div className="flex-1 lg:flex-none">
-              <h1 className="text-lg font-semibold text-gray-800"> Aplicación</h1>
-            </div>
-            <div className="flex items-center">
-              <Button icon="pi pi-bell"></Button>
-              
-              <div>
-                <Button icon="pi pi-info" onClick={(e)=>userMenuRef.current?.toggle(e)}></Button>
-                <Menu model={topbarItems} popup ref={userMenuRef} className=""></Menu>
-              </div>
-            </div>
-          </header>
-          {/*Maincontent*/}
-          <main className="flex-1 p-4">
-            {children}
-          </main>
-        </div>
-      </div>
+        </main>
     </div> 
   );
 }

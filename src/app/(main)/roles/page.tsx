@@ -1,4 +1,4 @@
-import Image from "next/image";
+/*import Image from "next/image";
 
 export default function RolesPage() {
   return (
@@ -6,4 +6,51 @@ export default function RolesPage() {
       HOLA DESDE ROLES
     </div>
   );
+}
+*/
+'use client'
+// 1. Asegúrate de incluir useState y useEffect en los imports
+import { usePathname } from "next/navigation";
+import { useRouter } from "next/navigation";
+import { Menu } from "primereact/menu";
+import { useRef, useState, useEffect } from "react";
+
+export default function MainLayout({ children }: { children: React.ReactNode }) {
+    // 2. Definimos el estado para los usuarios
+    const [users, setUsers] = useState<any[]>([]); // Empezamos con un array vacío
+    const [loading, setLoading] = useState(true);
+
+    const router = useRouter();
+    const pathname = usePathname();
+    const userMenuRef = useRef<Menu>(null);
+
+    // 3. El "puente" al backend de NestJS
+    useEffect(() => {
+        fetch('http://localhost:5000/users') // Tu endpoint de Nest
+            .then(res => {
+                if (!res.ok) throw new Error('Error en la red');
+                return res.json();
+            })
+            .then(data => {
+                setUsers(data); // Aquí guardamos los usuarios
+                setLoading(false);
+            })
+            .catch(err => {
+                console.error("Error al conectar con NestJS:", err);
+                setLoading(false);
+            });
+    }, []);
+
+    // ... resto de tus navigationItems y topbarItems
+
+    return (
+        <div className="min-h-screen bg-gray-200">
+            {/* Ejemplo para ver si llegan los datos: */}
+            <div className="p-4 bg-white shadow mb-4">
+                <h3>Usuarios detectados: {loading ? 'Cargando...' : users.length}</h3>
+            </div>
+            
+            {children}
+        </div> 
+    );
 }
