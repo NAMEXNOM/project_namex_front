@@ -4,6 +4,7 @@ import "./globals.css";
 import 'primeicons/primeicons.css';
 import "primereact/resources/themes/lara-light-cyan/theme.css";
 import { PrimeReactProvider, PrimeReactContext} from 'primereact/api'
+import { AuthProvider } from '../context/AuthContext';
 
 export default function RootLayout({
   children,
@@ -11,13 +12,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="es">
       <body>
-        <PrimeReactProvider>
+        <AuthProvider>
           {children}
-        </PrimeReactProvider>
-        
+        </AuthProvider>
       </body>
     </html>
+
   );
 }

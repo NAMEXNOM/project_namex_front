@@ -3,9 +3,13 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useRouter } from "next/navigation";
 import { Button } from "primereact/button";
+import { InputText } from "primereact/inputtext";
 import { Menu } from "primereact/menu";
 import { MenuItem } from "primereact/menuitem";
+import { Password } from "primereact/password";
 import { useEffect, useRef, useState } from "react";
+
+import { Divider } from 'primereact/divider';
 
 export default function MainLayout(
   {children}: {children: React.ReactNode}) {
@@ -41,13 +45,12 @@ export default function MainLayout(
       { label: 'Perfil', icon: 'pi pi-plus', command: () => {alert("USER PROFILE")}},
       { label: 'Salir', icon: 'pi pi-sign-out', command: () => {alert("LOGOUT") }}
     ]
-
-    
+ 
   
     return (
-    <div className="min-h-screen bg-gray-200 flex">
+     <div className="surface-ground flex align-items-center justify-content-center min-h-screen">
         {/* Sidebar Lateral */}
-        <aside className="w-64 bg-white shadow-md">
+        {/*<aside className="w-64 bg-white shadow-md">
             <div className="p-4 font-bold text-xl border-b">Mi App</div>
             <nav className="p-2">
                 {navigationItems.map((item) => (
@@ -61,10 +64,43 @@ export default function MainLayout(
                     </Link>
                 ))}
             </nav>
-        </aside>
+        </aside>*/}
 
-        {/* Contenido Principal */}
-        <main className="flex-1">
+
+        <div className="surface-card p-6 shadow-2 border-round-xl w-full" style={{ maxWidth: '450px' }}>
+                <div className="text-center mb-5">
+                    <img src="/namex.png" alt="logo" height="50" className="mb-3" />
+                    <div className="text-900 text-3xl font-medium mb-3">Bienvenido</div>
+                </div>
+
+                <div>
+                    <label htmlFor="email" className="block text-900 font-medium mb-2">Email</label>
+                    <InputText 
+                        id="email" 
+                    
+                        className="w-full mb-3 p-inputtext-lg" 
+                    />
+
+                    <label htmlFor="password" className="block text-900 font-medium mb-2">Contraseña</label>
+                    <Password 
+                        id="password" 
+                    
+                        toggleMask 
+                        feedback={false}
+                        className="w-full mb-3" 
+                        inputClassName="w-full p-3" 
+                    />
+
+                    <Button 
+                        label="Entrar" 
+                        icon="pi pi-sign-in" 
+                   
+                        className="w-full p-3 text-xl" 
+                    />
+                </div>
+
+          {/* Contenido Principal */}
+          <main className="flex-1">
             <header className="bg-white p-4 shadow-sm flex justify-between items-center">
                 <span>Bienvenido, {datos?.name || 'Cargando...'}</span>
                 <Menu model={topbarItems} popup ref={userMenuRef} />
@@ -78,7 +114,8 @@ export default function MainLayout(
             <div className="p-6">
                 {children} {/* Aquí se mostrarán las páginas /users, /roles, etc. */}
             </div>
-        </main>
-    </div> 
+          </main>
+        </div> 
+    </div>
   );
 }

@@ -12,6 +12,8 @@ export default function RolesPage() {
 // 1. Asegúrate de incluir useState y useEffect en los imports
 import { usePathname } from "next/navigation";
 import { useRouter } from "next/navigation";
+import { Column } from "primereact/column";
+import { DataTable } from "primereact/datatable";
 import { Menu } from "primereact/menu";
 import { useRef, useState, useEffect } from "react";
 
@@ -44,13 +46,12 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
     // ... resto de tus navigationItems y topbarItems
 
     return (
-        <div className="min-h-screen bg-gray-200">
-            {/* Ejemplo para ver si llegan los datos: */}
-            <div className="p-4 bg-white shadow mb-4">
-                <h3>Usuarios detectados: {loading ? 'Cargando...' : users.length}</h3>
-            </div>
-            
-            {children}
-        </div> 
+        <div className="card">
+            <DataTable value={users} tableStyle={{ minWidth: '50rem' }}>
+                <Column field="id" header="ID"></Column>
+                <Column field="name" header="Nombre"></Column>
+                <Column field="email" header="Correo"></Column>
+            </DataTable>
+        </div>
     );
 }

@@ -5,10 +5,48 @@ import { Button } from "primereact/button";
 import { InputText } from "primereact/inputtext";
 import { Menu } from "primereact/menu";
 import { Password } from "primereact/password";
-import { Children } from "react";
+import { Children, useState } from "react";
 import { Divider } from 'primereact/divider';
+import { useRouter } from "next/navigation";
+import { useAuth } from "../../../context/AuthContext"; // El contexto que crearemos
+
 
 export default function LoginPage() {
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [loading, setLoading] = useState(false);
+
+    
+    
+    const router = useRouter();
+    const { login } = useAuth(); // Función para guardar el usuario globalmente
+
+    const handleLogin = async () => {
+        setLoading(true);
+        try {
+            const response = await fetch('http://localhost:5000/auth/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, password }),
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                // Si el backend responde bien, guardamos datos y redirigimos
+                login({ nombre: data.userName, token: data.token });
+                router.push('/'); // Vamos al Home
+            } else {
+                alert(data.message || "Error al entrar");
+            }
+        } catch (error) {
+            console.error("Error de conexión:", error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+
   return (
     
 
