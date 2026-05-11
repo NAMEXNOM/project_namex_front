@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 //import { ProductService } from './service/ProductService';
-import { ProductService } from '@/app/services/product.service';
+import { ProductService } from '../../app/services/product.service';
 
 interface Product {
     id: string;

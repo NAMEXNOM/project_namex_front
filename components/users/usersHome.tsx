@@ -17,7 +17,7 @@ import { InputNumber,InputNumberValueChangeEvent } from 'primereact/inputnumber'
 import { Dialog } from 'primereact/dialog';
 import { InputText } from 'primereact/inputtext';
 import { Tag } from 'primereact/tag';
-import { ProductService } from '@/app/services/product.service';
+import { ProductService } from '../../app/services/product.service';
 
 interface Product {
   id: string | null;
