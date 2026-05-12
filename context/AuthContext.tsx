@@ -7,6 +7,7 @@ interface User {
   token: string;
   role?: string;    // Opcional, por si lo usas después
   userBalance: number;
+  userId: string;
 }
 
 interface AuthContextType {

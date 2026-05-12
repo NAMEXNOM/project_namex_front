@@ -19,7 +19,7 @@ export default function VacationsPage() {
         }
     }, [user]);
 
-    const fetchVacations = async () => {
+  /*  const fetchVacations = async () => {
         try {
             const response = await fetch('http://localhost:5000/vacations/mis-vacaciones', {
                 headers: {
@@ -35,7 +35,28 @@ export default function VacationsPage() {
         } finally {
             setLoading(false);
         }
-    };
+    };*/
+    const fetchVacations = async () => {
+    // Validación de seguridad: si no hay ID, no dispares la petición todavía
+    if (!user?.userId) {
+        console.warn("Esperando el userId del contexto...");
+        return; 
+    }
+
+    try {
+        const response = await fetch(`http://localhost:5000/vacations/`);
+        if (response.ok) {
+        const data = await response.json();
+        console.log("Datos crudos recibidos del Backend:", data);
+
+        setVacations(data);
+        }
+    } catch (error) {
+        console.error("Error al obtener vacaciones:", error);
+    } finally {
+        setLoading(false);
+    }
+};
 
     return (
         <div className="surface-card p-1 md:p-3 shadow-2 border-round-xl">

@@ -42,7 +42,8 @@ export default function LoginPage() {
                 login({ 
                     userName: data.userName,      // Esto pondrá el email/nombre que viene en "user"
                     token: data.access_token,     // Importante: usar guion bajo como en tu payload
-                    userBalance: data.userBalance
+                    userBalance: data.userBalance,
+                    userId: data.userId
                 });
                 
                 router.push('/'); 
