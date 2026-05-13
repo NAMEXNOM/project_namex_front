@@ -36,7 +36,7 @@ export default function LoginPage() {
             if (res.ok) {
                  // --- AQUÍ PONES LAS DOS LÍNEAS ---
                     //const data = await res.json(); 
-                    console.log("Respuesta de NestJS:", data); 
+                    //console.log("Respuesta de NestJS:", data); 
                 // ---------------------------------
                 // Sincronizado con tu Payload: 'access_token' y 'user'
                 login({ 

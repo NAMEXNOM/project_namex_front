@@ -1,7 +1,7 @@
 'use client'
 import { useRouter } from 'next/navigation';
 import { Button } from 'primereact/button';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../../context/AuthContext';
 
 export default function HomePage() {
     const router = useRouter();
