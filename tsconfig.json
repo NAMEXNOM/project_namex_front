@@ -37,7 +37,7 @@
     "app/(full-page)/layout.tsx.back",
     "next.config.js",
     ".next/dev/types/**/*.ts"
-  ],
+, "app/(main)/vacations/page.back"  ],
   "exclude": [
     "node_modules"
   ]
