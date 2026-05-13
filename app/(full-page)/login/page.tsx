@@ -31,11 +31,11 @@ export default function LoginPage() {
                 body: JSON.stringify({ userRFC, password })
             });
 
-          //  const data = await res.json(); // Se llama una sola vez
+            const data = await res.json(); // Se llama una sola vez
 
             if (res.ok) {
                  // --- AQUÍ PONES LAS DOS LÍNEAS ---
-                    const data = await res.json(); 
+                    //const data = await res.json(); 
                     console.log("Respuesta de NestJS:", data); 
                 // ---------------------------------
                 // Sincronizado con tu Payload: 'access_token' y 'user'
