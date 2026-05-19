@@ -43,7 +43,7 @@ export default function NextMainLayout({ children }: { children: React.ReactNode
                 
                 {/* Sección Derecha: Usuario y Cierre de sesión */}
                 <div className="flex align-items-center gap-3">
-                    <span className="text-sm">Hola, <b>{user?.userName.split(" ")[0] || 'Usuario'}</b></span>
+                    <span className="text-sm">Hola, <b>{user?.userName || 'Usuario'}</b></span>
                     <Button 
                         icon="pi pi-sign-out" 
                         label="Salir" 

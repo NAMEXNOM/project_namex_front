@@ -17,7 +17,7 @@ export default function LoginPage() {
     const { login } = useAuth();
     const router = useRouter();
 
-    const ejecutarLogin = async () => {
+   /* const ejecutarLogin = async (e?: React.FormEvent) => {
         if (!userRFC || !password) {
             alert("Por favor ingresa tu RFC y contraseña");
             return;
@@ -57,7 +57,65 @@ export default function LoginPage() {
         } finally {
             setLoading(false);
         }
-    };
+    };*/
+
+
+// 1. Agrega el parámetro 'e' (evento) a la función
+const ejecutarLogin = async (e?: React.FormEvent) => {
+    // 2. Detén por completo cualquier recarga de página automática
+    if (e) e.preventDefault();
+
+    if (!userRFC || !password) {
+        alert("Por favor ingresa tu RFC y contraseña");
+        return;
+    }
+
+    setLoading(true);
+try {
+    const res = await fetch('http://localhost:5000/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userRFC, password })
+    });
+
+    const data = await res.json(); 
+
+    // 1. Verificación estricta del Estatus de Red y del objeto de NestJS
+    if (!res.ok || data.status === 404 || data.status === 401 || data.name === 'HttpException') {
+        
+        console.warn("❌ LOGIN RECHAZADO POR EL SERVIDOR:", data);
+        
+        // Extraemos el mensaje de error que viene desde NestJS
+        const msg = data.message || "Credenciales incorrectas";
+        alert(Array.isArray(msg) ? msg.join(', ') : msg);
+        
+        setLoading(false);
+        return; // 🚨 CRÍTICO: Detiene por completo la ejecución para que NO guarde sesión ni redirija
+    }
+
+    // 2. Si el código llega aquí, significa que la respuesta de red fue verdaderamente exitosa (HTTP 200-299)
+    console.log("✅ LOGIN EXITOSO. Guardando sesión con datos reales:", data);
+    
+    login({ 
+        userName: data.userName,      
+        token: data.access_token,     
+        userBalance: data.userBalance,
+        userId: data.userId
+    });
+    
+    router.push('/'); 
+
+} catch (error) {
+    console.error("🚨 Error crítico de red o código en el Frontend:", error);
+    alert("Error de conexión con el servidor. Verifica que el Backend esté encendido.");
+} finally {
+    setLoading(false);
+}
+
+};
+
+
+
 
     return (
     /* Contenedor principal: ocupa todo el ancho y alto, y centra el contenido */
