@@ -14,8 +14,12 @@ export default function RecoverPage() {
     const ejecutarRecuperacion = async (e?: React.FormEvent) => {
         if (e) e.preventDefault();
 
-        // 1. Validaciones básicas en el cliente
-        if (!userRFC || !email) {
+        // Limpiar espacios en blanco
+        const cleanRFC = userRFC.trim();
+        const cleanEmail = email.trim().toLowerCase(); // El correo suele ser minúsculas
+
+        // 1. Validaciones básicas en el cliente utilizando los datos limpios
+        if (!cleanRFC || !cleanEmail) {
             alert("Por favor ingresa tu RFC y tu Correo Electrónico.");
             return;
         }
@@ -26,8 +30,11 @@ export default function RecoverPage() {
             const res = await fetch('http://localhost:5000/auth/recover-password', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ userRFC, email })
-            });
+                body: JSON.stringify({ 
+                    userRFC: cleanRFC, 
+                    email: cleanEmail 
+                }) // Enviamos los datos limpios
+            })
 
             const data = await res.json();
 

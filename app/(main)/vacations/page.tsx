@@ -9,15 +9,30 @@ export default function MisVacacionesPage() {
     const [vacations, setVacations] = useState<any[]>([]); // Tipado básico para el estado
     const [loading, setLoading] = useState(true);
 
-    useEffect(() => {
-    // Obtenemos el userId y el token desde el contexto o el almacenamiento local
-    const userId = user?.userId || localStorage.getItem('userId');
-    const token = user?.token || localStorage.getItem('token');
+// app/(main)/vacations/page.tsx
 
-    // 🚨 Bloqueo de seguridad: Si no hay credenciales, esperamos a que cargue el contexto
+useEffect(() => {
+    // 1. Intentamos obtener los datos del contexto global 'user'
+    let userId = user?.userId;
+    let token = user?.token;
+
+    // 2. Si no están en el contexto (por un F5/refresco), los extraemos de 'userSession' de forma segura
     if (!userId || !token) {
-        console.warn("Esperando el userId y el token de autenticación...");
-        setLoading(false);
+        const sessionRaw = localStorage.getItem('userSession');
+        if (sessionRaw) {
+            try {
+                const sessionData = JSON.parse(sessionRaw);
+                userId = sessionData.userId;
+                token = sessionData.token;
+            } catch (e) {
+                console.error("Error al parsear userSession desde el localStorage:", e);
+            }
+        }
+    }
+
+    // 🚨 Bloqueo de seguridad: Si después de buscar en ambos lados aún falta algo, esperamos
+    if (!userId || !token) {
+        console.warn("Esperando el userId y el token de autenticación de userSession...");
         return;
     }
 
@@ -28,7 +43,7 @@ export default function MisVacacionesPage() {
                 method: 'GET',
                 headers: { 
                     'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
+                    'Authorization': `Bearer ${token}` // Ahora sí llevará el token real de la sesión
                 }
             });
 
@@ -47,8 +62,8 @@ export default function MisVacacionesPage() {
     };
 
     cargarVacaciones();
-    // 🔄 SOLUCIÓN: Eliminamos 'user' global y dejamos un tamaño fijo de 2 elementos primitivos
-    }, [user?.userId, user?.token]); 
+}, [user?.userId, user?.token]); // Se mantiene la escucha de cambios primitivos
+
 
     // 🎨 Formateador visual sin marcar errores en TypeScript (tipo: any)
     const tipoRegistroTemplate = (rowData: any) => {
