@@ -41,7 +41,7 @@ export default function ChangePasswordPage() {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ 
-                    userId: user?.userId || user?.id, // Enviamos el ID del usuario logueado
+                    userId: user?.userId , // Enviamos el ID del usuario logueado
                     password: newPassword 
                 })
             });
