@@ -3,18 +3,31 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+<<<<<<< HEAD
     "dev": "next dev --turbopack",
+=======
+    "dev": "next dev",
+>>>>>>> develop
     "build": "next build --turbopack",
     "start": "next start",
     "lint": "eslint"
   },
   "dependencies": {
     "axios": "^1.15.2",
+<<<<<<< HEAD
     "next": "15.5.15",
     "primeicons": "^7.0.0",
     "primereact": "^10.9.7",
     "react": "19.1.0",
     "react-dom": "19.1.0"
+=======
+    "next": "^16.2.6",
+    "primeflex": "^4.0.0",
+    "primeicons": "^7.0.0",
+    "primereact": "^10.9.7",
+    "react": "^19.2.6",
+    "react-dom": "^19.2.6"
+>>>>>>> develop
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
