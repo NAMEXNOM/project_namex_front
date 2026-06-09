@@ -80,7 +80,7 @@ export default function RecoverPage() {
                             value={userRFC} 
                             onChange={(e) => setUserRFC(e.target.value.toUpperCase())} 
                             className="w-full p-inputtext-lg" 
-                            placeholder="Mete tu RFC con Homoclave"
+                            placeholder="Ingresa tu RFC con Homoclave"
                         />
                     </div>
 
