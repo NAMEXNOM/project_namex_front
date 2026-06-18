@@ -51,8 +51,34 @@ const ejecutarLogin = async (e?: React.FormEvent) => {
 
         // 2. Si el código llega aquí, significa que la respuesta fue exitosa
         console.log("✅ LOGIN EXITOSO. Validando estado de cuenta del usuario:", data);
-        
+
         login({ 
+            userName: data.userName,      
+            token: data.access_token,     
+            userBalance: data.userBalance,
+            userId: data.userId
+        });
+
+        // 🟢 NUEVO: Guardar banderas en una Cookie para que el Middleware las lea en el servidor
+        document.cookie = `namex_session=${JSON.stringify({
+            userId: data.userId,
+            firstTimeLoad: data.firstTimeLoad,
+            status: data.status
+        })}; path=/; max-age=86400; SameSite=Strict; Secure`;
+
+        // 🚨 Forzamos a Next.js a refrescar los estados internos de ruta
+        router.refresh();
+        
+        // 🚨 REDIRECCIÓN INTELIGENTE
+        if (data.firstTimeLoad === true || data.status === 'TEMPORAL') {
+            console.log("🔄 Redirigiendo a cambio de contraseña obligatorio...");
+            router.push('/change-password'); 
+        } else {
+            console.log("➡️ Redirigiendo al Dashboard principal...");
+            router.push('/'); 
+        }
+        
+      /*  login({ 
             userName: data.userName,      
             token: data.access_token,     
             userBalance: data.userBalance,
@@ -70,7 +96,7 @@ const ejecutarLogin = async (e?: React.FormEvent) => {
         } else {
             console.log("➡️ Redirigiendo al Dashboard principal...");
             router.push('/'); 
-        }
+        }  */
 
     } catch (error) {
         console.error("🚨 Error crítico de red o código en el Frontend:", error);

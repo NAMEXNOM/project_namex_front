@@ -75,7 +75,7 @@ interface User {
 
 interface AuthContextType {
   user: User | null;
-  loading: boolean; // 🚨 NUEVO: Bandera para saber si el sistema está inicializando
+  loading: boolean;
   login: (userData: User) => void;
   logout: () => void;
 }
@@ -84,9 +84,9 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState<boolean>(true); // 🚨 Inicia en true
+  const [loading, setLoading] = useState<boolean>(true);
 
-  // 2. Persistencia: Cargar datos al montar el componente
+  // Cargar datos al montar el componente
   useEffect(() => {
     const storedUser = localStorage.getItem('userSession');
     if (storedUser) {
@@ -98,25 +98,31 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         localStorage.removeItem('userSession');
       }
     }
-    setLoading(false); // 🚨 TERMINÓ DE LEER: El sistema ya sabe si hay usuario o no
+    setLoading(false);
   }, []);
 
   const login = (userData: User) => {
     setUser(userData);
     localStorage.setItem('userSession', JSON.stringify(userData));
+    
     // Guarda el token en las cookies del navegador por 1 día para que el Proxy lo lea
-    document.cookie = `token=${userData.token}; path=/; max-age=86400; SameSite=Strict`;
+    document.cookie = `token=${userData.token}; path=/; max-age=86400; SameSite=Strict; Secure`;
   };
 
   const logout = () => {
+    // 1. 🟢 REPARADO: Quitamos setToken(null) ya que el token vive dentro de setUser(null)
     setUser(null);
+
+    // 2. 🟢 REPARADO: Sincronizado para borrar 'userSession' del almacenamiento local
     localStorage.removeItem('userSession');
 
-    // 🚨 AGREGA ESTA LÍNEA AQUÍ (Borra la cookie al salir):
-    document.cookie = "token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+    // 3. 🟢 UNIFICADO: Limpiamos ambas cookies expirándolas inmediatamente
+    document.cookie = "token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; SameSite=Strict; Secure";
+    document.cookie = "namex_session=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; SameSite=Strict; Secure";
+    
+    console.log("🔒 Sesión destruida limpiamente en cliente y servidor.");
   };
 
-  // Pasamos 'loading' en el Provider para que las páginas puedan consultarlo
   return (
     <AuthContext.Provider value={{ user, loading, login, logout }}>
       {children}
@@ -131,4 +137,5 @@ export const useAuth = () => {
   }
   return context;
 };
+
 
