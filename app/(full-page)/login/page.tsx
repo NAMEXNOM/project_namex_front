@@ -66,7 +66,7 @@ const ejecutarLogin = async (e?: React.FormEvent) => {
             userId: data.userId,
             firstTimeLoad: data.firstTimeLoad,
             status: data.status
-        })}; path=/; max-age=86400; SameSite=Strict; Secure`;
+        })}; path=/; max-age=86400; SameSite=Lax`;
 
         // 🚨 Forzamos a Next.js a refrescar los estados internos de ruta
         router.refresh();
