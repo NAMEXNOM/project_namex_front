@@ -1,4 +1,5 @@
 'use client';
+import { API_URL } from '../../../utils/api';
 import { useEffect, useState } from 'react';
 import { useAuth } from '../../../context/AuthContext'; // Ajusta la ruta a tu AuthContext
 import { DataTable } from 'primereact/datatable';
@@ -39,7 +40,8 @@ useEffect(() => {
     const cargarVacaciones = async () => {
         try {
             setLoading(true);
-            const res = await fetch(`http://localhost:5000/vacations/user?userId=${userId}`, {
+            //const res = await fetch(`http://localhost:5000/vacations/user?userId=${userId}`, {
+            const res = await fetch(`${API_URL}/vacations/user?userId=${userId}`, {
                 method: 'GET',
                 headers: { 
                     'Content-Type': 'application/json',

@@ -1,4 +1,5 @@
 'use client';
+import { API_URL } from '../../utils/api';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { InputText } from "primereact/inputtext";
@@ -27,7 +28,8 @@ export default function RecoverPage() {
         setLoading(true);
         try {
             // 2. Consumir el endpoint de envío de clave temporal
-            const res = await fetch('http://localhost:5000/auth/recover-password', {
+            //const res = await fetch('http://localhost:5000/auth/recover-password', {
+            const res = await fetch(`${API_URL}/auth/recover-password`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ 

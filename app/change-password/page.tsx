@@ -1,4 +1,5 @@
 'use client';
+import { API_URL } from '../../utils/api';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '../../context/AuthContext'; // 🚨 Ajusta esta ruta a tu AuthContext real
@@ -37,7 +38,8 @@ export default function ChangePasswordPage() {
         setLoading(true);
         try {
             // 2. Consumir el endpoint que acabamos de crear en NestJS
-            const res = await fetch('http://localhost:5000/auth/change-password', {
+            //const res = await fetch('http://localhost:5000/auth/change-password', {
+            const res = await fetch(`${API_URL}/auth/change-password`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ 

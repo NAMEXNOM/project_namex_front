@@ -1,15 +1,6 @@
-/*import Image from "next/image";
-
-export default function RolesPage() {
-  return (
-    <div className="text-lg">
-      HOLA DESDE ROLES
-    </div>
-  );
-}
-*/
 'use client'
 // 1. Asegúrate de incluir useState y useEffect en los imports
+import { API_URL } from '../../../utils/api';
 import { usePathname } from "next/navigation";
 import { useRouter } from "next/navigation";
 import { Column } from "primereact/column";
@@ -28,7 +19,8 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
 
     // 3. El "puente" al backend de NestJS
     useEffect(() => {
-        fetch('http://localhost:5000/users') // Tu endpoint de Nest
+        //fetch('http://localhost:5000/users') // Tu endpoint de Nest
+        fetch(`${API_URL}/users`) // Tu endpoint de Nest
             .then(res => {
                 if (!res.ok) throw new Error('Error en la red');
                 return res.json();

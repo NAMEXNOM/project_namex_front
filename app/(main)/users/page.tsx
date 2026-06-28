@@ -1,4 +1,5 @@
 'use client';
+import { API_URL } from '../../../utils/api';
 import { useState, useEffect } from 'react';
 import { useAuth } from '../../../context/AuthContext';
 import { DataTable } from 'primereact/datatable';
@@ -13,7 +14,8 @@ export default function UsersPage() {
         if (!user?.token) return; // Si no hay token, no hacemos nada
 
         // 2. Llamar al backend usando el token
-        fetch('http://localhost:5000/users', {
+        //fetch('http://localhost:5000/users', {
+        fetch(`${API_URL}/users`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
