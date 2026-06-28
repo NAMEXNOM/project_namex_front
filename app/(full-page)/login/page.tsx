@@ -42,7 +42,8 @@ const ejecutarLogin = async (e?: React.FormEvent) => {
         const data = await res.json(); 
 
         // 1. Verificación estricta del Estatus de Red y del objeto de NestJS
-        if (!res.ok || data.status === 404 || data.status === 401 || data.name === 'HttpException') {
+        //if (!res.ok || data.status === 404 || data.status === 401 || data.name === 'HttpException') {
+        if (!res.ok || data.name === 'HttpException') {
             const msg = data.message || "Credenciales incorrectas";
             alert(Array.isArray(msg) ? msg.join(', ') : msg);
             
