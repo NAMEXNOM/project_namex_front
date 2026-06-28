@@ -77,7 +77,8 @@ const ejecutarLogin = async (e?: React.FormEvent) => {
             router.push('/change-password'); 
         } else {
         //    console.log("➡️ Redirigiendo al Dashboard principal...");
-            router.push('/'); 
+            //router.push('/');
+            window.location.href = '/';  
         }
         
 
