@@ -106,7 +106,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     localStorage.setItem('userSession', JSON.stringify(userData));
     
     // Guarda el token en las cookies del navegador por 1 día para que el Proxy lo lea
-    document.cookie = `token=${userData.token}; path=/; max-age=86400; SameSite=Strict; Secure`;
+    document.cookie = `token=${userData.token}; path=/; max-age=86400; SameSite=Lax`;
   };
 
   const logout = () => {
@@ -117,7 +117,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     localStorage.removeItem('userSession');
 
     // 3. 🟢 UNIFICADO: Limpiamos ambas cookies expirándolas inmediatamente
-    document.cookie = "token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; SameSite=Strict; Secure";
+    document.cookie = "token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; SameSite=Lax";
     document.cookie = "namex_session=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; SameSite=Strict; Secure";
     
     console.log("🔒 Sesión destruida limpiamente en cliente y servidor.");
