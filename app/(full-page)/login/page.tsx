@@ -88,7 +88,7 @@ const ejecutarLogin = async (e?: React.FormEvent) => {
         // 3. Forzar la actualización e ir de forma obligatoria al Dashboard principal
         router.refresh();
 
-
+/*
         // 🚨 REDIRECCIÓN INTELIGENTE
         if (data.firstTimeLoad === true || data.status === 'TEMPORAL') {
         //    console.log("🔄 Redirigiendo a cambio de contraseña obligatorio...");
@@ -98,7 +98,7 @@ const ejecutarLogin = async (e?: React.FormEvent) => {
             router.push('/');
             //window.location.href = '/';  
         }
-        
+ */       
 
     } catch (error) {
         console.error("🚨 Error crítico de red o código en el Frontend:", error);
