@@ -32,8 +32,8 @@ const ejecutarLogin = async (e?: React.FormEvent) => {
 
     setLoading(true);
     try {
-        //const res = await fetch('http://localhost:5000/auth/login', {
-        const res = await fetch(`${API_URL}/auth/login`, {
+        const res = await fetch('http://localhost:5000/auth/login', {
+        //const res = await fetch(`${API_URL}/auth/login`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ userRFC, password })
@@ -42,8 +42,8 @@ const ejecutarLogin = async (e?: React.FormEvent) => {
         const data = await res.json(); 
 
         // 1. Verificación estricta del Estatus de Red y del objeto de NestJS
-        //if (!res.ok || data.status === 404 || data.status === 401 || data.name === 'HttpException') {
-        if (!res.ok || data.name === 'HttpException') {
+        if (!res.ok || data.status === 404 || data.status === 401 || data.name === 'HttpException') {
+        //if (!res.ok || data.name === 'HttpException') {
             const msg = data.message || "Credenciales incorrectas";
             alert(Array.isArray(msg) ? msg.join(', ') : msg);
             
@@ -53,7 +53,7 @@ const ejecutarLogin = async (e?: React.FormEvent) => {
 
         // 2. Si el código llega aquí, significa que la respuesta fue exitosa
         
-
+/*
         login({ 
             userName: data.userName,      
             token: data.access_token,     
@@ -70,15 +70,33 @@ const ejecutarLogin = async (e?: React.FormEvent) => {
 
         // 🚨 Forzamos a Next.js a refrescar los estados internos de ruta
         router.refresh();
-        
+        */
+
+
+        login({ 
+            userName: data.userName,      
+            token: data.access_token,     
+            userBalance: data.userBalance,
+            userId: data.userId
+        });
+
+        // 2. 🟢 GUARDAR COOKIES INDIVIDUALES EN TEXTO PLANO (Soportado nativamente por el Middleware de Next.js)
+        document.cookie = `namex_userId=${data.userId}; path=/; max-age=86400; SameSite=Lax`;
+        document.cookie = `namex_firstTimeLoad=${data.firstTimeLoad}; path=/; max-age=86400; SameSite=Lax`;
+        document.cookie = `namex_status=${data.status}; path=/; max-age=86400; SameSite=Lax`;
+
+        // 3. Forzar la actualización e ir de forma obligatoria al Dashboard principal
+        router.refresh();
+
+
         // 🚨 REDIRECCIÓN INTELIGENTE
         if (data.firstTimeLoad === true || data.status === 'TEMPORAL') {
         //    console.log("🔄 Redirigiendo a cambio de contraseña obligatorio...");
             router.push('/change-password'); 
         } else {
         //    console.log("➡️ Redirigiendo al Dashboard principal...");
-            //router.push('/');
-            window.location.href = '/';  
+            router.push('/');
+            //window.location.href = '/';  
         }
         
 
