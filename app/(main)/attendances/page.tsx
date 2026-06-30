@@ -6,6 +6,7 @@ import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { Accordion, AccordionTab } from 'primereact/accordion';
 import { ProgressSpinner } from 'primereact/progressspinner';
+import { API_URL } from '../../../utils/api';
 
 interface PeriodoAsistencia {
     id: number;
@@ -47,7 +48,8 @@ export default function AsistenciasPage() {
         const cargarAsistencias = async () => {
             try {
                 setLoading(true);
-                const res = await fetch(`http://127.0.0.1:5000/attendances/user?userId=${userId}`, {
+                //const res = await fetch(`http://127.0.0.1:5000/attendances/user?userId=${userId}`, {
+                const res = await fetch(`${API_URL}/attendances/user?userId=${userId}`, {
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json',
