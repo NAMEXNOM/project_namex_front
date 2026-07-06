@@ -1,3 +1,4 @@
+/*
 // app/(main)/attendances/page.tsx
 'use client';
 import { useEffect, useState } from 'react';
@@ -188,3 +189,202 @@ export default function AsistenciasPage() {
         </div>
     );
 }
+*/
+
+// app/(main)/attendances/page.tsx
+'use client';
+import { useEffect, useState } from 'react';
+import { useAuth } from '../../../context/AuthContext';
+import { DataTable } from 'primereact/datatable';
+import { Column } from 'primereact/column';
+import { Accordion, AccordionTab } from 'primereact/accordion';
+import { ProgressSpinner } from 'primereact/progressspinner';
+import { API_URL } from '../../../utils/api';
+
+interface PeriodoAsistencia {
+    id: number;
+    label: string;
+    startDate: Date;
+    endDate: Date;
+    data: any[];
+}
+
+export default function AsistenciasPage() {
+    const { user } = useAuth();
+    const [periods, setPeriods] = useState<PeriodoAsistencia[]>([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        let userId = user?.userId;
+        let token = user?.token;
+
+        if (!userId || !token) {
+            const sessionRaw = localStorage.getItem('userSession');
+            if (sessionRaw) {
+                try {
+                    const sessionData = JSON.parse(sessionRaw);
+                    userId = sessionData.userId;
+                    token = sessionData.token;
+                } catch (e) {
+                    console.error("Error al parsear userSession:", e);
+                }
+            }
+        }
+
+        if (!userId || !token) {
+            setLoading(false);
+            return;
+        }
+
+        const cargarAsistencias = async () => {
+            try {
+                setLoading(true);
+                const res = await fetch(`${API_URL}/attendances/user?userId=${userId}`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (res.ok) {
+                    const responseData = await res.json();
+                    procesarYAgruparPeriodos(
+                        responseData.attendances || [], 
+                        responseData.config?.periodStartDate, 
+                        responseData.config?.periodEndDate
+                    );
+                } else {
+                    console.error("Error al consultar asistencias. Estatus:", res.status);
+                }
+            } catch (error) {
+                console.error("Error de conexión con el backend:", error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        cargarAsistencias();
+    }, [user]);
+
+    const procesarYAgruparPeriodos = (attendances: any[], startStr: string, endStr: string) => {
+        if (!startStr) return;
+        const fechaInicioTotal = new Date(startStr);
+        
+        const semanas: PeriodoAsistencia[] = [];
+        const nombresPeriodos = ['2 Semanas Atrás', '1 Semana Atrás', 'Período Actual'];
+
+        for (let i = 0; i < 3; i++) {
+            const inicioSemana = new Date(fechaInicioTotal);
+            inicioSemana.setDate(fechaInicioTotal.getDate() + (i * 7));
+            inicioSemana.setHours(0, 0, 0, 0);
+
+            const finSemana = new Date(inicioSemana);
+            finSemana.setDate(inicioSemana.getDate() + 6);
+            finSemana.setHours(23, 59, 59, 999);
+
+            const datosSemana = attendances.filter(attendance => {
+                if (!attendance.recDate) return false;
+                const fechaAsistencia = new Date(attendance.recDate + 'T00:00:00');
+                return fechaAsistencia >= inicioSemana && fechaAsistencia <= finSemana;
+            });
+
+            semanas.push({
+                id: i,
+                label: nombresPeriodos[i],
+                startDate: inicioSemana,
+                endDate: finSemana,
+                data: datosSemana
+            });
+        }
+
+        setPeriods([...semanas].reverse());
+    };
+
+    const formatTime = (rowData: any, field: string) => {
+        if (!rowData[field]) return <span className="text-400">-:-</span>;
+        return <span>{rowData[field].substring(0, 5)}</span>;
+    };
+
+    const buildHeaderTemplate = (period: PeriodoAsistencia) => {
+        const opciones: Intl.DateTimeFormatOptions = { day: '2-digit', month: 'short' };
+        const inicioFormateado = period.startDate.toLocaleDateString('es-MX', opciones);
+        const finFormateado = period.endDate.toLocaleDateString('es-MX', opciones);
+        return (
+            <div className="flex justify-content-between align-items-center w-full pr-3">
+                <span className="font-semibold text-sm">{period.label}</span>
+                <span className="text-xs text-500 font-normal">({inicioFormateado} al {finFormateado})</span>
+            </div>
+        );
+    };
+
+    if (loading) {
+        return (
+            <div className="flex justify-content-center align-items-center min-h-screen">
+                <ProgressSpinner style={{ width: '50px', height: '50px' }} strokeWidth="4" />
+            </div>
+        );
+    }
+
+    return (
+        <div className="surface-card p-2 md:p-4 shadow-2 border-round-xl m-2">
+            <div className="flex align-items-center mb-3">
+                <i className="pi pi-calendar-clock text-blue-600 text-2xl mr-2"></i>
+                <h2 className="text-xl font-bold text-800 m-0">Mis Asistencias Semanales</h2>
+            </div>
+            
+            <Accordion activeIndex={0}>
+                {periods.map((period) => (
+                    <AccordionTab key={period.id} header={buildHeaderTemplate(period)}>
+                        <DataTable 
+                            value={period.data} 
+                            size="small" 
+                            className="text-xs"
+                            emptyMessage="No se encontraron registros de asistencia para esta semana."
+                            stripedRows
+                        >
+                            <Column 
+                                header="Día / Fecha" 
+                                style={{ width: '15%' }}
+                                body={(row) => {
+                                    const fechaObj = new Date(row.recDate + 'T00:00:00');
+                                    return <span className="capitalize">{fechaObj.toLocaleDateString('es-MX', { weekday: 'short', day: '2-digit' })}</span>;
+                                }}
+                            />
+                            <Column field="recType" header="Tipo" style={{ width: '10%' }} />
+                            <Column field="shift" header="Turno" style={{ width: '8%' }} bodyStyle={{ textAlign: 'center' }} />
+                            <Column header="Entrada 1" body={(row) => formatTime(row, 'checkIn1')} bodyStyle={{ textAlign: 'center' }} />
+                            <Column header="Salida 1" body={(row) => formatTime(row, 'checkOut1')} bodyStyle={{ textAlign: 'center' }} />
+                            <Column header="Entrada 2" body={(row) => formatTime(row, 'checkIn2')} bodyStyle={{ textAlign: 'center' }} />
+                            <Column header="Salida 2" body={(row) => formatTime(row, 'checkOut2')} bodyStyle={{ textAlign: 'center' }} />
+                            
+                            {/* 🟢 NUEVA COLUMNA: Horas Ordinarias (Por consistencia visual) */}
+                            <Column 
+                                header="Hrs Regular" 
+                                bodyStyle={{ textAlign: 'center' }} 
+                                body={(row) => <span>{row.dailyHours ? Number(row.dailyHours).toFixed(2) : '0.00'}</span>} 
+                            />
+
+                            {/* 🟢 NUEVA COLUMNA: Horas Extra (dailyHoursOVT renderizado como NUMERIC(5,2)) */}
+                            <Column 
+                                header="Hrs Extra (OVT)" 
+                                bodyStyle={{ textAlign: 'center', fontWeight: 'bold' }} 
+                                className="text-green-600"
+                                body={(row) => <span>{row.dailyHoursOVT ? Number(row.dailyHoursOVT).toFixed(2) : '0.00'}</span>} 
+                            />
+
+                            {/* 🟢 NUEVA COLUMNA: ID de Incidencia (Muestra el string plano o un guion) */}
+                            <Column 
+                                field="incidentId" 
+                                header="Incidencia" 
+                                bodyStyle={{ textAlign: 'center' }} 
+                                body={(row) => row.incidentId ? <span className="p-badge p-badge-warning text-xs font-semibold">{row.incidentId}</span> : <span className="text-400">-</span>}
+                            />
+                        </DataTable>
+                    </AccordionTab>
+                ))}
+            </Accordion>
+        </div>
+    );
+}
+
