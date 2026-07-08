@@ -1,58 +1,3 @@
-/*
-
-// context/AuthGuard.tsx
-'use client';
-import { useAuth } from './AuthContext';
-import { useRouter, usePathname } from 'next/navigation';
-import { useEffect } from 'react';
-
-export const AuthGuard = ({ children }: { children: React.ReactNode }) => {
-  // 1. Extraemos el estado 'loading' que añadimos a tu contexto
-  const { user, loading } = useAuth();
-  const router = useRouter();
-  const pathname = usePathname();
-
-  useEffect(() => {
-    // 2. CRÍTICO: Si el AuthContext sigue leyendo el localStorage, nos esperamos.
-    if (loading) return;
-
-    // 3. Definimos qué páginas son públicas (cualquiera puede verlas sin loguearse)
-    const esRutaPublica = pathname === '/login' || pathname === '/recover';
-
-    // 4. Si no hay usuario y no es una ruta pública, lo mandamos al login
-    if (!user && !esRutaPublica) {
-      router.push('/login');
-    }
-    
-    // 5. Si ya hay un usuario activo e intenta ir al login o recover, lo mandamos al home
-    if (user && esRutaPublica) {
-      // Excepción especial: Si el usuario tiene estatus TEMPORAL, lo mandamos a cambiar clave
-      if (user.role === 'sin-role' || user.userName.includes('TEMPORAL')) { 
-         // Esto es opcional por si quieres forzarlo desde aquí, si no, directo a '/'
-         router.push('/');
-      } else {
-         router.push('/');
-      }
-    }
-  }, [user, pathname, router, loading]);
-
-  // 6. Mientras lee el localStorage, podemos mostrar una pantalla de carga limpia de PrimeReact
-  if (loading) {
-    return (
-      <div className="flex align-items-center justify-content-center min-h-screen surface-ground">
-         <i className="pi pi-spin pi-spinner text-blue-500" style={{ fontSize: '3rem' }}></i>
-      </div>
-    );
-  }
-
-  // 7. Si no hay sesión y no es una ruta pública, bloqueamos el renderizado mientras redirige
-  const esRutaPublica = pathname === '/login' || pathname === '/recover' || pathname === '/change-password';
-  if (!user && !esRutaPublica) return null;
-
-  return <>{children}</>;
-};
-*/
-
 // context/AuthGuard.tsx
 'use client';
 import { useAuth } from './AuthContext';
@@ -67,17 +12,34 @@ export const AuthGuard = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     if (loading) return; // Esperar a que el Context lea el localStorage
 
-    // 🚨 REGISTRO DE RUTAS PÚBLICAS REPARADO: Añadimos /recover y /change-password
-    const esRutaPublica = pathname === '/login' || pathname === '/recover' || pathname === '/change-password';
+    // 1. Definimos las rutas que no requieren login
+    const esRutaPublica = pathname === '/login' || pathname === '/recover';
 
-    // Si no hay usuario y quiere ingresar a una pantalla privada, lo expulsamos
-    if (!user && !esRutaPublica) {
+    // 2. Evaluamos si el usuario actual tiene restricciones de contraseña temporal
+    // Validamos tanto booleano como string por compatibilidad con la base de datos
+    const esUsuarioTemporal = 
+      user?.status === 'TEMPORAL' || 
+      user?.status === 'temporal' || 
+      user?.firstTimeLoad === true || 
+      user?.firstTimeLoad === 'true';
+
+    // CASO A: Si no hay usuario y quiere ingresar a una pantalla privada, lo expulsamos al login
+    if (!user && !esRutaPublica && pathname !== '/change-password') {
       router.push('/login');
+      return;
     }
     
-    // Si ya inició sesión de forma normal e intenta entrar a login o recover, al home
-    if (user && (pathname === '/login' || pathname === '/recover')) {
+    // CASO B: El usuario es TEMPORAL y está intentando navegar a cualquier ruta que NO sea /change-password
+    if (user && esUsuarioTemporal && pathname !== '/change-password') {
+      console.log("🚨 AuthGuard: Usuario con credenciales temporales detectado. Forzando cambio de contraseña.");
+      router.push('/change-password');
+      return;
+    }
+
+    // CASO C: El usuario ya está ACTIVO (normal) e intenta entrar a login o recover, se le manda al home
+    if (user && !esUsuarioTemporal && (pathname === '/login' || pathname === '/recover')) {
       router.push('/');
+      return;
     }
   }, [user, pathname, router, loading]);
 
@@ -90,10 +52,15 @@ export const AuthGuard = ({ children }: { children: React.ReactNode }) => {
     );
   }
 
-  // 🚨 PROTECCIÓN REPARADA: No bloqueamos el renderizado de las 3 páginas públicas
-  const esRutaPublica = pathname === '/login' || pathname === '/recover' || pathname === '/change-password';
-  if (!user && !esRutaPublica) return null;
+  // 3. CONTROL DE RENDERIZADO SEGURO
+  const esRutaPublica = pathname === '/login' || pathname === '/recover';
+  
+  // Si no hay usuario y no es ruta pública (y no es change-password), bloqueamos renderizado
+  if (!user && !esRutaPublica && pathname !== '/change-password') return null;
+
+  // Si el usuario es temporal y trata de ver la raíz u otra página privada, bloqueamos la vista mientras redirige
+  const esUsuarioTemporal = user?.status === 'TEMPORAL' || user?.firstTimeLoad === true || user?.firstTimeLoad === 'true';
+  if (user && esUsuarioTemporal && pathname !== '/change-password') return null;
 
   return <>{children}</>;
 };
-

@@ -73,31 +73,37 @@ const ejecutarLogin = async (e?: React.FormEvent) => {
         */
 
 
-        login({ 
+        // 1. Guardar los datos en el Contexto de Autenticación
+       login({ 
             userName: data.userName,      
             token: data.access_token,     
             userBalance: data.userBalance,
-            userId: data.userId
+            userId: data.userId,
+            firstTimeLoad: data.firstTimeLoad, // 🟢 ENVIADO AL CONTEXTO
+            status: data.status               // 🟢 ENVIADO AL CONTEXTO
         });
 
-        // 2. 🟢 GUARDAR COOKIES INDIVIDUALES EN TEXTO PLANO (Soportado nativamente por el Middleware de Next.js)
-        document.cookie = `namex_userId=${data.userId}; path=/; max-age=86400; SameSite=Lax`;
+        // 2. 🟢 GUARDAR COOKIES INDIVIDUALES EN TEXTO PLANO
+         document.cookie = `namex_userId=${data.userId}; path=/; max-age=86400; SameSite=Lax`;
         document.cookie = `namex_firstTimeLoad=${data.firstTimeLoad}; path=/; max-age=86400; SameSite=Lax`;
         document.cookie = `namex_status=${data.status}; path=/; max-age=86400; SameSite=Lax`;
 
-        // 3. Forzar la actualización e ir de forma obligatoria al Dashboard principal
-        router.refresh();
+        // 3. 🚨 REDIRECCIÓN INTELIGENTE INMEDIATA (Reparada)
+        // Forzamos evaluación tanto para booleanos puros como para strings que vengan de la BD
+        const esPrimerIngreso = data.firstTimeLoad === true || data.firstTimeLoad === 'true';
+        const esEstatusTemporal = data.status === 'TEMPORAL' || data.status === 'temporal';
 
-
-        // 🚨 REDIRECCIÓN INTELIGENTE
-        if (data.firstTimeLoad === true || data.status === 'TEMPORAL') {
-        //    console.log("🔄 Redirigiendo a cambio de contraseña obligatorio...");
+        if (esPrimerIngreso || esEstatusTemporal) {
             router.push('/change-password'); 
         } else {
-        //    console.log("➡️ Redirigiendo al Dashboard principal...");
             router.push('/');
-            //window.location.href = '/';  
         }
+        
+        // 4. Ejecutar el refresh con un desfase mínimo para no romper la navegación del paso anterior
+        setTimeout(() => {
+            router.refresh();
+        }, 150);
+
         
 
     } catch (error) {
