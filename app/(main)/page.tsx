@@ -34,7 +34,7 @@ export default function HomePage() {
                     <div className="flex-1 p-3 border-round-lg bg-orange-50 border-2 border-orange-200 flex flex-column align-items-center">
                         <i className="pi pi-calendar-times text-orange-600 text-xl mb-2"></i>
                         <span className="text-700 text-xs font-semibold uppercase">Tomadas</span>
-                        <span className="text-orange-900 font-bold text-2xl">0</span>
+                        <span className="text-orange-900 font-bold text-2xl">{user?.vacationsTaken ?? 0}</span>
                     </div>
                 </div>
 

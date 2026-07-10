@@ -6,6 +6,8 @@ export interface LoginResponse {
     userName: string;
     role?: string;
     userBalance: number;
+    vacationsTaken: number;
+
   };
 }
 

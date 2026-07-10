@@ -267,7 +267,97 @@ export default function AsistenciasPage() {
         cargarAsistencias();
     }, [user]);
 
-    const procesarYAgruparPeriodos = (attendances: any[], startStr: string, endStr: string) => {
+ // ORDEN ASCENDENTE
+/*
+const procesarYAgruparPeriodos = (attendances: any[], startStr: string, endStr: string) => {
+        if (!startStr) return;
+        
+        // 1. Forzamos a que la fecha base de inicio no sufra desfases de zona horaria agregando la hora explícita
+        const fechaInicioTotal = new Date(startStr + 'T00:00:00');
+        
+        const semanas: PeriodoAsistencia[] = [];
+        const nombresPeriodos = ['2 Semanas Atrás', '1 Semana Atrás', 'Período Actual'];
+
+        // Constante con los milisegundos exactos que tiene 1 día
+        const UN_DIA_EN_MS = 24 * 60 * 60 * 1000;
+
+        for (let i = 0; i < 3; i++) {
+            // 2. 🟢 CORRECCIÓN: Calculamos el inicio multiplicando los días en milisegundos puros
+            const desfaseInicioMs = i * 7 * UN_DIA_EN_MS;
+            const inicioSemana = new Date(fechaInicioTotal.getTime() + desfaseInicioMs);
+            inicioSemana.setHours(0, 0, 0, 0);
+
+            // 3. 🟢 CORRECCIÓN: El fin de semana es exactamente 6 días después en milisegundos
+            const finSemana = new Date(inicioSemana.getTime() + (6 * UN_DIA_EN_MS));
+            finSemana.setHours(23, 59, 59, 999);
+
+            const datosSemana = attendances.filter(attendance => {
+                if (!attendance.recDate) return false;
+                const fechaAsistencia = new Date(attendance.recDate + 'T00:00:00');
+                return fechaAsistencia >= inicioSemana && fechaAsistencia <= finSemana;
+            });
+
+            semanas.push({
+                id: i,
+                label: nombresPeriodos[i],
+                startDate: inicioSemana,
+                endDate: finSemana,
+                data: datosSemana
+            });
+        }
+
+        setPeriods([...semanas].reverse());
+    };
+
+// TERMINA ORDEN ASCENDENTE
+*/
+
+// ORDEN DESCENDENTE
+const procesarYAgruparPeriodos = (attendances: any[], startStr: string, endStr: string) => {
+        if (!startStr) return;
+        
+        const fechaInicioTotal = new Date(startStr + 'T00:00:00');
+        const semanas: PeriodoAsistencia[] = [];
+        const nombresPeriodos = ['2 Semanas Atrás', '1 Semana Atrás', 'Período Actual'];
+        const UN_DIA_EN_MS = 24 * 60 * 60 * 1000;
+
+        for (let i = 0; i < 3; i++) {
+            const desfaseInicioMs = i * 7 * UN_DIA_EN_MS;
+            const inicioSemana = new Date(fechaInicioTotal.getTime() + desfaseInicioMs);
+            inicioSemana.setHours(0, 0, 0, 0);
+
+            const finSemana = new Date(inicioSemana.getTime() + (6 * UN_DIA_EN_MS));
+            finSemana.setHours(23, 59, 59, 999);
+
+            // 1. Filtramos los datos pertenecientes a esta semana
+            const datosSemana = attendances.filter(attendance => {
+                if (!attendance.recDate) return false;
+                const fechaAsistencia = new Date(attendance.recDate + 'T00:00:00');
+                return fechaAsistencia >= inicioSemana && fechaAsistencia <= finSemana;
+            });
+
+            // 2. 🟢 NUEVO: Ordenamos los registros de forma DESCENDENTE (Día más nuevo primero)
+            datosSemana.sort((a, b) => {
+                return new Date(b.recDate + 'T00:00:00').getTime() - new Date(a.recDate + 'T00:00:00').getTime();
+            });
+
+            semanas.push({
+                id: i,
+                label: nombresPeriodos[i],
+                startDate: inicioSemana,
+                endDate: finSemana,
+                data: datosSemana // Guardamos los datos ya ordenados descendentemente
+            });
+        }
+
+        setPeriods([...semanas].reverse());
+    };
+// FIN ORDEN DESCENDENTE
+
+/////////////////////////
+    
+ 
+ /*   const procesarYAgruparPeriodos = (attendances: any[], startStr: string, endStr: string) => {
         if (!startStr) return;
         const fechaInicioTotal = new Date(startStr);
         
@@ -300,6 +390,8 @@ export default function AsistenciasPage() {
 
         setPeriods([...semanas].reverse());
     };
+*/
+
 
     const formatTime = (rowData: any, field: string) => {
         if (!rowData[field]) return <span className="text-400">-:-</span>;

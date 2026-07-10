@@ -7,6 +7,7 @@ interface User {
   token: string;
   role?: string;    
   userBalance: number;
+  vacationsTaken: number;
   userId: string;
   firstTimeLoad?: boolean | string; // 🚨 NUEVO
   status?: string;                  // 🚨 NUEVO

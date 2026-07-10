@@ -78,6 +78,7 @@ const ejecutarLogin = async (e?: React.FormEvent) => {
             userName: data.userName,      
             token: data.access_token,     
             userBalance: data.userBalance,
+            vacationsTaken: data.vacationsTaken,
             userId: data.userId,
             firstTimeLoad: data.firstTimeLoad, // 🟢 ENVIADO AL CONTEXTO
             status: data.status               // 🟢 ENVIADO AL CONTEXTO
